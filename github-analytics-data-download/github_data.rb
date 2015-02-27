@@ -3,8 +3,8 @@ require 'pp'
 require 'json'
 
 
-# Monkey Patch code to make Sawyer::Response allow me to access the Raw Body and not 
-# the Hypermedia version which is not does play friendly with MongoDB as it is not 
+# Monkey Patch code to make Sawyer::Response allow me to access the Raw Body and not
+# the Hypermedia version which is not does play friendly with MongoDB as it is not
 # JSON and currently no code exists to convert to JSON
 module Response
   attr_reader :response_body
@@ -20,21 +20,23 @@ end
 
 module GitHub_Data
 
+  PAGE_SIZE = 200
+
 	def self.gh_sinatra_auth(ghUser)
 
 		@ghClient = ghUser
 		# Octokit.auto_paginate = true
-		Octokit.per_page = 100
+		Octokit.per_page = PAGE_SIZE
 		return @ghClient
 
 	end
 
 	def self.gh_authenticate(username, password)
 		@ghClient = Octokit::Client.new(
-										:login => username.to_s, 
-										:password => password.to_s, 
+										:login => username.to_s,
+										:password => password.to_s,
 										# :auto_paginate => true
-										:per_page => 100
+										:per_page => PAGE_SIZE
 										)
 	end
 
@@ -43,12 +45,12 @@ module GitHub_Data
 		puts "1: #{@ghClient.rate_limit.remaining}"
 		issueResultsOpen = @ghClient.list_issues(repo, {
 			:state => :open,
-			:per_page => 100
+			:per_page => PAGE_SIZE
 			})
 
 		ghLastReponseOpen = @ghClient.last_response
 		responseOpen = JSON.parse(@ghClient.last_response.response_body)
-		
+
 		while ghLastReponseOpen.rels.include?(:next) do
 			puts "2: #{@ghClient.rate_limit.remaining}"
 			ghLastReponseOpen = ghLastReponseOpen.rels[:next].get
@@ -58,7 +60,7 @@ module GitHub_Data
 		puts "3: #{@ghClient.rate_limit.remaining}"
 		issueResultsClosed = @ghClient.list_issues(repo, {
 			:state => :closed,
-			:per_page => 100
+			:per_page => PAGE_SIZE
 			})
 
 		ghLastReponseClosed = @ghClient.last_response
@@ -87,18 +89,18 @@ module GitHub_Data
 	def self.get_Issue_Comments(repo, issueNumber)
 		puts "5: #{@ghClient.rate_limit.remaining}"
 		issueComments = @ghClient.issue_comments(repo, issueNumber, {
-			:per_page => 100
+			:per_page => PAGE_SIZE
 			})
-		
+
 		ghLastReponseComments = @ghClient.last_response
 		responseComments = JSON.parse(@ghClient.last_response.response_body)
-	
+
 		while ghLastReponseComments.rels.include?(:next) do
 			puts "6: #{@ghClient.rate_limit.remaining}"
 			ghLastReponseComments = ghLastReponseComments.rels[:next].get
 			responseComments.concat(JSON.parse(ghLastReponseComments.response_body))
 		end
-		
+
 		return responseComments
 	end
 
@@ -113,19 +115,17 @@ module GitHub_Data
 
 	def self.get_repo_issue_events(repo)
 		issueResultsOpen = @ghClient.repository_issue_events(repo, {
-			:per_page => 100
+			:per_page => PAGE_SIZE
 			})
 		ghLastReponseRepoIssueEvents = @ghClient.last_response
 		responseRepoEvents = JSON.parse(@ghClient.last_response.response_body)
-		
+
 		while ghLastReponseRepoIssueEvents.rels.include?(:next) do
 			ghLastReponseRepoIssueEvents = ghLastReponseRepoIssueEvents.rels[:next].get
 			responseRepoEvents.concat(JSON.parse(ghLastReponseRepoIssueEvents.response_body))
 		end
 		return responseRepoEvents
 	end
-
-
 
 end
 

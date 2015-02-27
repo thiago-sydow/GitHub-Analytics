@@ -7,21 +7,21 @@ module Events_Aggregation
 
 	def self.controller
 
-		Mongo_Connection.mongo_Connect("localhost", 27017, "GitHub-Analytics", "Issues-Data")
+		Mongo_Connection.mongo_Connect(ENV['MONGODB_URL'], ENV['MONGODB_PORT'], "GitHub-Analytics", "Issues-Data")
 
 	end
 
 	def self.get_repo_issues_Events_per_month(repo, githubAuthInfo)
-		
+
 		repoIssueEvents = Mongo_Connection.aggregate_test([
 			{ "$match" => {type: "Repo Issue Event"}},
 			{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
-			{"$project" => {_id: 1, 
+			{"$project" => {_id: 1,
 							repo: 1,
 							event: 1,
-							created_month: {"$month" => "$created_at"}, 
-							created_year: {"$year" => "$created_at"}, 
-							}},			
+							created_month: {"$month" => "$created_at"},
+							created_year: {"$year" => "$created_at"},
+							}},
 
 			{ "$match" => { repo: repo }},
 
@@ -37,7 +37,7 @@ module Events_Aggregation
 
 
 		output = []
-		
+
 		repoIssueEvents.each do |x|
 			x["_id"]["count"] = x["count"]
 			x["_id"]["converted_date"] = DateTime.new(x["_id"]["created_year"], x["_id"]["created_month"])
@@ -53,7 +53,7 @@ module Events_Aggregation
 			end
 			b = (output.first["converted_date"]..output.last["converted_date"]).to_a
 			zeroValueDates = (b.map{ |date| date.strftime("%b %Y") } - a.map{ |date| date.strftime("%b %Y") }).uniq
-			
+
 			zeroValueDates.each do |zvd|
 				zvd = DateTime.parse(zvd)
 				output << {"repo"=> repo, "event" => "n/a", "created_year"=>zvd.strftime("%Y").to_i, "created_month"=>zvd.strftime("%m").to_i, "count"=>0, "converted_date"=>zvd}
@@ -71,6 +71,3 @@ end
 # Debug code
 # Events_Aggregation.controller
 # puts Events_Aggregation.get_repo_issues_Events_per_month("StephenOTT/Test1", {:username => "StephenOTT", :userID => 1994838})
-
-
-

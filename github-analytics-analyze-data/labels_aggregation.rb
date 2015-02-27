@@ -4,7 +4,7 @@ module Labels_Aggregation
 
 	def self.controller
 
-		Mongo_Connection.mongo_Connect("localhost", 27017, "GitHub-Analytics", "Issues-Data")
+		Mongo_Connection.mongo_Connect(ENV['MONGODB_URL'], ENV['MONGODB_PORT'], "GitHub-Analytics", "Issues-Data")
 
 	end
 
@@ -12,10 +12,10 @@ module Labels_Aggregation
 		totalIssueSpentHoursBreakdown = Mongo_Connection.aggregate_test([
 			{ "$match" => {type: "Issue"}},
 			{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
-			{"$project" => {_id: 1, 
+			{"$project" => {_id: 1,
 							repo: 1,
 							labels: { name: 1},
-									}},			
+									}},
 			{ "$match" => { repo: repo }},
 			{ "$unwind" => "$labels" },
 			{ "$group" => { _id: {
@@ -40,19 +40,19 @@ module Labels_Aggregation
 
 	# def self.get_issues_time_for_label_and_milestone(repo, category, label, milestoneNumber)
 	# 	totalIssueSpentHoursBreakdown = Mongo_Connection.aggregate_test([
-	# 		{"$project" => {type: 1, 
-	# 						issue_number: 1, 
-	# 						_id: 1, 
+	# 		{"$project" => {type: 1,
+	# 						issue_number: 1,
+	# 						_id: 1,
 	# 						repo: 1,
-	# 						milestone_number: 1, 
-	# 						issue_state: 1, 
-	# 						issue_title: 1, 
-	# 						time_tracking_commits: { duration: 1, 
-	# 												type: 1, 
+	# 						milestone_number: 1,
+	# 						issue_state: 1,
+	# 						issue_title: 1,
+	# 						time_tracking_commits: { duration: 1,
+	# 												type: 1,
 	# 												comment_id: 1 },
 	# 						labels: { category: 1,
 	# 								  label: 1 },
-	# 												}},			
+	# 												}},
 	# 		{ "$match" => { repo: repo }},
 	# 		{ "$match" => { type: "Issue" }},
 	# 		{ "$match" => { milestone_number: milestoneNumber }},
@@ -88,5 +88,3 @@ end
 # Debug Code
 # Labels_Aggregation.controller
 # puts Labels_Aggregation.get_labels_count_for_repo("StephenOTT/OPSEU", {:username => "StephenOTT", :userID => 1994838})
-
-

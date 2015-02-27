@@ -3,14 +3,14 @@ require_relative './mongo'
 module System_Wide_Aggregation
 
 	def self.controller
-		Mongo_Connection.mongo_Connect("localhost", 27017, "GitHub-Analytics", "Issues-Data")
+		Mongo_Connection.mongo_Connect(ENV['MONGODB_URL'], ENV['MONGODB_PORT'], "GitHub-Analytics", "Issues-Data")
 	end
 
 	def self.get_all_repos_assigned_to_logged_user(githubAuthInfo)
 		reposAssignedToLoggedUser = Mongo_Connection.aggregate_test([
 			{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
-			{"$project" => {_id: 1, 
-							repo: 1}},			
+			{"$project" => {_id: 1,
+							repo: 1}},
 			{ "$group" => { _id: {
 							repo: "$repo"
 							}}}

@@ -1,6 +1,7 @@
 require_relative 'github_data'
 require_relative 'mongo'
 require_relative 'convert_dates'
+require 'parallel'
 
 module Analytics_Download_Controller
 
@@ -9,8 +10,8 @@ module Analytics_Download_Controller
 		GitHub_Data.gh_sinatra_auth(object1)
 
 		# MongoDb connection: DB URL, Port, DB Name, Collection Name
-		Mongo_Connection.mongo_Connect("localhost", 27017, "GitHub-Analytics", "Issues-Data")
-		
+		Mongo_Connection.mongo_Connect(ENV['MONGODB_URL'], ENV['MONGODB_PORT'], "GitHub-Analytics", "Issues-Data")
+
 		# Clears the DB collections if clearCollections var in controller argument is true
 		if clearCollections == true
 			Mongo_Connection.clear_mongo_collections
@@ -18,10 +19,10 @@ module Analytics_Download_Controller
 
 		#======Start of Issues=======
 		issues = GitHub_Data.get_Issues(repo)
-		
-		
+
+
 		# goes through each issue returned from get_Issues method
-		issues.each do |i|
+		Parallel.each(issues, :in_threads=>10) do |i|
 			# puts i
 			i = Dates_Convert_For_MongoDB.convertIssueDatesForMongo(i)
 
@@ -67,6 +68,3 @@ module Analytics_Download_Controller
 
 	end
 end
-
-
-
