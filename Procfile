@@ -1,1 +1,1 @@
-web: sh app/start.sh
+web: bundle exec rackup
