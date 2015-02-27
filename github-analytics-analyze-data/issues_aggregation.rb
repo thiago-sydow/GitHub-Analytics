@@ -7,7 +7,7 @@ module Issues_Aggregation
 
 	def self.controller
 
-		Mongo_Connection.mongo_Connect("localhost", 27017, "GitHub-Analytics", "Issues-Data")
+		Mongo_Connection.mongo_Connect(ENV['MONGODB_URL'], ENV['MONGODB_PORT'], "GitHub-Analytics", "Issues-Data")
 
 	end
 
@@ -15,10 +15,10 @@ module Issues_Aggregation
 		totalIssueSpentHoursBreakdown = Mongo_Connection.aggregate_test([
 			{ "$match" => {type: "Issue"}},
 			{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
-			{"$project" => {number: 1, 
-							_id: 1, 
-							repo: 1,  
-							user: { login: 1}}},			
+			{"$project" => {number: 1,
+							_id: 1,
+							repo: 1,
+							user: { login: 1}}},
 			{ "$match" => { repo: repo }},
 			{ "$group" => { _id: {
 							repo: "$repo",
@@ -38,20 +38,20 @@ module Issues_Aggregation
 		totalIssuesOpen = Mongo_Connection.aggregate_test([
 			{ "$match" => {type: "Issue"}},
 			{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
-			# { "$match" => {state: { 
+			# { "$match" => {state: {
 			# 							"$ne" => "closed"
 			# 							}}},
-			{"$project" => {number: 1, 
-							_id: 1, 
+			{"$project" => {number: 1,
+							_id: 1,
 							repo: 1,
 							state: 1,
 							created_at: 1,
 							# closed_at: 1,
-							created_month: {"$month" => "$created_at"}, 
-							created_year: {"$year" => "$created_at"}, 
-							# closed_month: {"$month" => "$closed_at"}, 
+							created_month: {"$month" => "$created_at"},
+							created_year: {"$year" => "$created_at"},
+							# closed_month: {"$month" => "$closed_at"},
 							# closed_year: {"$year" => "$closed_at"}
-							}},			
+							}},
 
 			{ "$match" => { repo: repo }},
 
@@ -71,7 +71,7 @@ module Issues_Aggregation
 		totalIssuesOpen.each do |x|
 			x["_id"]["count"] = x["issues_opened_count"]
 			x["_id"]["converted_date"] = DateTime.new(x["_id"]["created_year"], x["_id"]["created_month"])
-			# x["_id"]["date1"] = Date.new(x["_id"]["created_year"],2,3) 
+			# x["_id"]["date1"] = Date.new(x["_id"]["created_year"],2,3)
 			output << x["_id"]
 		end
 
@@ -83,7 +83,7 @@ module Issues_Aggregation
 		# 		a << x["converted_date"]
 		# 	end
 		# 	b = (output.first["converted_date"]..output.last["converted_date"]).to_a
-			
+
 		# 	# zeroValueDates = (b.map{ |date| date } - a.map{ |date| date }).uniq
 		# 	zeroValueDates = (b.map{ |date| date.strftime("%b %Y") } - a.map{ |date| date.strftime("%b %Y") }).uniq
 		# 	puts zeroValueDates
@@ -101,24 +101,24 @@ module Issues_Aggregation
 	end
 
 	def self.get_issues_closed_per_month(repo, githubAuthInfo)
-		
+
 		totalIssuesClosed = Mongo_Connection.aggregate_test([
 			{ "$match" => {type: "Issue"}},
 			{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
-			{ "$match" => {state: { 
-										"$ne" => "open" 
+			{ "$match" => {state: {
+										"$ne" => "open"
 										}}},
-			{"$project" => {number: 1, 
-							_id: 1, 
+			{"$project" => {number: 1,
+							_id: 1,
 							repo: 1,
 							# state: 1,
 							# created_at: 1,
 							closed_at: 1,
-							closed_month: {"$month" => "$closed_at"}, 
-							closed_year: {"$year" => "$closed_at"}, 
-							# closed_month: {"$month" => "$closed_at"}, 
+							closed_month: {"$month" => "$closed_at"},
+							closed_year: {"$year" => "$closed_at"},
+							# closed_month: {"$month" => "$closed_at"},
 							# closed_year: {"$year" => "$closed_at"}
-							}},			
+							}},
 
 			{ "$match" => { repo: repo }},
 
@@ -135,11 +135,11 @@ module Issues_Aggregation
 
 
 		output = []
-		
+
 		totalIssuesClosed.each do |x|
 			x["_id"]["count"] = x["issues_opened_count"]
 			x["_id"]["converted_date"] = DateTime.new(x["_id"]["closed_year"], x["_id"]["closed_month"])
-			# x["_id"]["date1"] = Date.new(x["_id"]["created_year"],2,3) 
+			# x["_id"]["date1"] = Date.new(x["_id"]["created_year"],2,3)
 			output << x["_id"]
 		end
 
@@ -152,7 +152,7 @@ module Issues_Aggregation
 			end
 			b = (output.first["converted_date"]..output.last["converted_date"]).to_a
 			zeroValueDates = (b.map{ |date| date.strftime("%b %Y") } - a.map{ |date| date.strftime("%b %Y") }).uniq
-			
+
 			zeroValueDates.each do |zvd|
 				zvd = DateTime.parse(zvd)
 				output << {"repo"=> repo, "closed_year"=>zvd.strftime("%Y").to_i, "closed_month"=>zvd.strftime("%m").to_i, "count"=>0, "converted_date"=>zvd}
@@ -170,17 +170,17 @@ module Issues_Aggregation
 		totalIssuesOpen = Mongo_Connection.aggregate_test([
 			{ "$match" => {type: "Issue"}},
 			{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
-			# { "$match" => {state: { 
+			# { "$match" => {state: {
 			# 							"$ne" => "closed"
 			# 							}}},
-			{"$project" => { 
-							_id: 1, 
+			{"$project" => {
+							_id: 1,
 							repo: 1,
 							created_at: 1,
 							# dayofweek: {"$dayOfWeek" => "$created_at" },
-							week: {"$week" => "$created_at"}, 
-							year: {"$year" => "$created_at"}, 
-							}},			
+							week: {"$week" => "$created_at"},
+							year: {"$year" => "$created_at"},
+							}},
 
 			{ "$match" => { repo: repo }},
 
@@ -199,7 +199,7 @@ module Issues_Aggregation
 		totalIssuesOpen.each do |x|
 			x["_id"]["count"] = x["count"]
 			# %w - Day of the week (Sunday is 0, 0..6)
-				
+
 				dayOfWeekNumber = 0
 
 				until dayOfWeekNumber == 6 do
@@ -243,20 +243,20 @@ module Issues_Aggregation
 
 
 	def self.get_issues_closed_per_week(repo, githubAuthInfo)
-		
+
 		totalIssuesClosed = Mongo_Connection.aggregate_test([
 			{ "$match" => {type: "Issue"}},
 			{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
-			{ "$match" => {state: { 
-										"$ne" => "open" 
+			{ "$match" => {state: {
+										"$ne" => "open"
 										}}},
-			{"$project" => {_id: 1, 
+			{"$project" => {_id: 1,
 							repo: 1,
 							dayofweek: {"$dayOfWeek" => "$closed_at" },
-							week: {"$week" => "$closed_at"}, 
-							year: {"$year" => "$closed_at"}, 
-							closed_at:1 
-							}},			
+							week: {"$week" => "$closed_at"},
+							year: {"$year" => "$closed_at"},
+							closed_at:1
+							}},
 
 			{ "$match" => { repo: repo }},
 
@@ -267,15 +267,15 @@ module Issues_Aggregation
 							# dayofweek: "$dayofweek"
 							},
 							count: { "$sum" => 1 },
-							}},						
-		    { "$sort" => {"_id.year" => 1, "_id.week" => 1}},		    
+							}},
+		    { "$sort" => {"_id.year" => 1, "_id.week" => 1}},
 			])
 
 		output = []
 		totalIssuesClosed.each do |x|
 			x["_id"]["count"] = x["count"]
 			# %w - Day of the week (Sunday is 0, 0..6)
-				
+
 				dayOfWeekNumber = 0
 
 				until dayOfWeekNumber == 6 do
@@ -326,7 +326,7 @@ module Issues_Aggregation
 
 
 	# def self.get_issues_created_closed_per_month
-		
+
 	# 	issuesCreatedPerMonth = @collIssues.aggregate([
 	# 		{ "$match" => {closed_at: {"$ne" => nil}}},
 	# 	    { "$project" => {created_month: {"$month" => "$created_at"}, created_year: {"$year" => "$created_at"}, closed_month: {"$month" => "$closed_at"}, closed_year: {"$year" => "$closed_at"}, state: 1}},
@@ -344,7 +344,7 @@ module Issues_Aggregation
 	# 	newHashClosed={}
 	# 	issuesCreatedPerMonth.each do |x|
 	# 			newHashOpened[Date.strptime(x["_id"].values_at('created_month', 'created_year').join(" "), '%m %Y')] = x["number"]
-			
+
 	# 		if x["_id"]["closed_month"] != nil
 	# 			newHashClosed[Date.strptime(x["_id"].values_at('closed_month', 'closed_year').join(" "), '%m %Y')] = x["number"]
 	# 		end
@@ -364,17 +364,17 @@ module Issues_Aggregation
 	# def self.get_issue_time(repo, issueNumber, githubAuthInfo)
 	# 	totalIssueSpentHoursBreakdown = Mongo_Connection.aggregate_test([
 	# 		{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
-	# 		{"$project" => {type: 1, 
-	# 						issue_number: 1, 
-	# 						_id: 1, 
+	# 		{"$project" => {type: 1,
+	# 						issue_number: 1,
+	# 						_id: 1,
 	# 						repo: 1,
-	# 						milestone_number: 1, 
-	# 						issue_state: 1, 
-	# 						issue_title: 1, 
-	# 						time_tracking_commits:{ duration: 1, 
-	# 												type: 1, 
+	# 						milestone_number: 1,
+	# 						issue_state: 1,
+	# 						issue_title: 1,
+	# 						time_tracking_commits:{ duration: 1,
+	# 												type: 1,
 	# 												comment_id: 1 }}},
-	# 		{ "$match" => { repo: repo }},			
+	# 		{ "$match" => { repo: repo }},
 	# 		{ "$match" => { type: "Issue" }},
 	# 		{ "$match" => {issue_number: issueNumber.to_i}},
 	# 		{ "$unwind" => "$time_tracking_commits" },
@@ -405,15 +405,15 @@ module Issues_Aggregation
 	# def self.get_all_issues_budget(repo, githubAuthInfo)
 	# 	totalIssueSpentHoursBreakdown = Mongo_Connection.aggregate_test([
 	# 		{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
-	# 		{"$project" => {type: 1, 
-	# 						issue_number: 1, 
-	# 						_id: 1, 
+	# 		{"$project" => {type: 1,
+	# 						issue_number: 1,
+	# 						_id: 1,
 	# 						repo: 1,
-	# 						milestone_number: 1, 
-	# 						issue_state: 1, 
-	# 						issue_title: 1, 
-	# 						time_tracking_commits:{ duration: 1, 
-	# 												type: 1, 
+	# 						milestone_number: 1,
+	# 						issue_state: 1,
+	# 						issue_title: 1,
+	# 						time_tracking_commits:{ duration: 1,
+	# 												type: 1,
 	# 												comment_id: 1 }}},
 	# 		{ "$match" => { repo: repo }},
 	# 		{ "$match" => { type: "Issue" }},
@@ -442,17 +442,17 @@ module Issues_Aggregation
 	# def self.get_issue_budget(repo, issueNumber, githubAuthInfo)
 	# 	totalIssueSpentHoursBreakdown = Mongo_Connection.aggregate_test([
 	# 		{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
-	# 		{"$project" => {type: 1, 
-	# 						issue_number: 1, 
-	# 						_id: 1, 
+	# 		{"$project" => {type: 1,
+	# 						issue_number: 1,
+	# 						_id: 1,
 	# 						repo: 1,
-	# 						milestone_number: 1, 
-	# 						issue_state: 1, 
-	# 						issue_title: 1, 
-	# 						time_tracking_commits:{ duration: 1, 
-	# 												type: 1, 
-	# 												comment_id: 1 }}},			
-	# 		{ "$match" => { repo: repo }},			
+	# 						milestone_number: 1,
+	# 						issue_state: 1,
+	# 						issue_title: 1,
+	# 						time_tracking_commits:{ duration: 1,
+	# 												type: 1,
+	# 												comment_id: 1 }}},
+	# 		{ "$match" => { repo: repo }},
 	# 		{ "$match" => { type: "Issue" }},
 	# 		{ "$match" => {issue_number: issueNumber.to_i}},
 	# 		{ "$unwind" => "$time_tracking_commits" },
@@ -482,17 +482,17 @@ module Issues_Aggregation
 	# def self.get_all_issues_time_in_milestone(repo, milestoneNumber, githubAuthInfo)
 	# 	totalIssueSpentHoursBreakdown = Mongo_Connection.aggregate_test([
 	# 		{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
-	# 		{"$project" => {type: 1, 
-	# 						issue_number: 1, 
-	# 						_id: 1, 
+	# 		{"$project" => {type: 1,
+	# 						issue_number: 1,
+	# 						_id: 1,
 	# 						repo: 1,
-	# 						milestone_number: 1, 
-	# 						issue_state: 1, 
-	# 						issue_title: 1, 
-	# 						time_tracking_commits:{ duration: 1, 
-	# 												type: 1, 
-	# 												comment_id: 1 }}},			
-	# 		{ "$match" => { repo: repo }},			
+	# 						milestone_number: 1,
+	# 						issue_state: 1,
+	# 						issue_title: 1,
+	# 						time_tracking_commits:{ duration: 1,
+	# 												type: 1,
+	# 												comment_id: 1 }}},
+	# 		{ "$match" => { repo: repo }},
 	# 		{ "$match" => { type: "Issue" }},
 	# 		{ "$match" => { milestone_number: milestoneNumber.to_i }},
 	# 		{ "$unwind" => "$time_tracking_commits" },
@@ -521,17 +521,17 @@ module Issues_Aggregation
 	# def self.get_total_issues_time_for_milestone(repo, milestoneNumber, githubAuthInfo)
 	# 	totalIssueSpentHoursBreakdown = Mongo_Connection.aggregate_test([
 	# 		{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
-	# 		{"$project" => {type: 1, 
-	# 						issue_number: 1, 
-	# 						_id: 1, 
+	# 		{"$project" => {type: 1,
+	# 						issue_number: 1,
+	# 						_id: 1,
 	# 						repo: 1,
-	# 						milestone_number: 1, 
-	# 						issue_state: 1, 
-	# 						issue_title: 1, 
-	# 						time_tracking_commits:{ duration: 1, 
-	# 												type: 1, 
-	# 												comment_id: 1 }}},			
-	# 		{ "$match" => { repo: repo }},			
+	# 						milestone_number: 1,
+	# 						issue_state: 1,
+	# 						issue_title: 1,
+	# 						time_tracking_commits:{ duration: 1,
+	# 												type: 1,
+	# 												comment_id: 1 }}},
+	# 		{ "$match" => { repo: repo }},
 	# 		{ "$match" => { type: "Issue" }},
 	# 		{ "$match" => { milestone_number: milestoneNumber.to_i }},
 	# 		{ "$unwind" => "$time_tracking_commits" },
@@ -559,16 +559,16 @@ module Issues_Aggregation
 	# def self.get_all_issues_budget_in_milestone(repo, milestoneNumber, githubAuthInfo)
 	# 	totalIssueSpentHoursBreakdown = Mongo_Connection.aggregate_test([
 	# 		{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
-	# 		{"$project" => {type: 1, 
-	# 						issue_number: 1, 
-	# 						_id: 1, 
+	# 		{"$project" => {type: 1,
+	# 						issue_number: 1,
+	# 						_id: 1,
 	# 						repo: 1,
-	# 						milestone_number: 1, 
-	# 						issue_state: 1, 
-	# 						issue_title: 1, 
-	# 						time_tracking_commits:{ duration: 1, 
-	# 												type: 1, 
-	# 												comment_id: 1 }}},			
+	# 						milestone_number: 1,
+	# 						issue_state: 1,
+	# 						issue_title: 1,
+	# 						time_tracking_commits:{ duration: 1,
+	# 												type: 1,
+	# 												comment_id: 1 }}},
 	# 		{ "$match" => { repo: repo }},
 	# 		{ "$match" => { type: "Issue" }},
 	# 		{ "$match" => { milestone_number: milestoneNumber.to_i }},
@@ -598,16 +598,16 @@ module Issues_Aggregation
 	# def self.get_repo_time_from_issues(repo, githubAuthInfo)
 	# 	totalIssueSpentHoursBreakdown = Mongo_Connection.aggregate_test([
 	# 		{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
-	# 		{"$project" => {type: 1, 
-	# 						issue_number: 1, 
-	# 						_id: 1, 
+	# 		{"$project" => {type: 1,
+	# 						issue_number: 1,
+	# 						_id: 1,
 	# 						repo: 1,
-	# 						milestone_number: 1, 
-	# 						issue_state: 1, 
-	# 						issue_title: 1, 
-	# 						time_tracking_commits:{ duration: 1, 
-	# 												type: 1, 
-	# 												comment_id: 1 }}},			
+	# 						milestone_number: 1,
+	# 						issue_state: 1,
+	# 						issue_title: 1,
+	# 						time_tracking_commits:{ duration: 1,
+	# 												type: 1,
+	# 												comment_id: 1 }}},
 	# 		{ "$match" => { repo: repo }},
 	# 		{ "$match" => { type: "Issue" }},
 	# 		{ "$unwind" => "$time_tracking_commits" },
@@ -631,16 +631,16 @@ module Issues_Aggregation
 	# def self.get_repo_budget_from_issues(repo, githubAuthInfo)
 	# 	totalIssueSpentHoursBreakdown = Mongo_Connection.aggregate_test([
 	# 		{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
-	# 		{"$project" => {type: 1, 
-	# 						issue_number: 1, 
-	# 						_id: 1, 
+	# 		{"$project" => {type: 1,
+	# 						issue_number: 1,
+	# 						_id: 1,
 	# 						repo: 1,
-	# 						milestone_number: 1, 
-	# 						issue_state: 1, 
-	# 						issue_title: 1, 
-	# 						time_tracking_commits:{ duration: 1, 
-	# 												type: 1, 
-	# 												comment_id: 1 }}},			
+	# 						milestone_number: 1,
+	# 						issue_state: 1,
+	# 						issue_title: 1,
+	# 						time_tracking_commits:{ duration: 1,
+	# 												type: 1,
+	# 												comment_id: 1 }}},
 	# 		{ "$match" => { repo: repo }},
 	# 		{ "$match" => { type: "Issue" }},
 	# 		{ "$unwind" => "$time_tracking_commits" },
@@ -669,6 +669,3 @@ end
 # puts Issues_Aggregation.get_issues_closed_per_month("StephenOTT/OPSEU", {:username => "StephenOTT", :userID => 1994838})
 # puts Issues_Aggregation.get_issues_closed_per_week("StephenOTT/OPSEU", {:username => "StephenOTT", :userID => 1994838})
 # puts Issues_Aggregation.get_issues_created_per_week("StephenOTT/Test1", {:username => "StephenOTT", :userID => 1994838})
-
-
-
