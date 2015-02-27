@@ -18,7 +18,7 @@ include Mongo
 		# MongoDB Database Connect
 		@client = MongoClient.new(url, port)
 		# @client = MongoClient.new("localhost", 27017)
-
+		dbName = ENV['MONGODB_DATABASE'] || dbName
 		# code for working with MongoLab
 		# uri = "mongodb://USERNAME:PASSWORD@ds061268.mongolab.com:61268/TimeTrackingCommits"
 		# @client = MongoClient.from_uri(uri)
@@ -30,7 +30,7 @@ include Mongo
 	end
 
 	def self.aggregate_test(input1)
-		
+
 		@collTimeTrackingCommits.aggregate(input1)
 
 	end
