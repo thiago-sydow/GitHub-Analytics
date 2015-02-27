@@ -1,6 +1,7 @@
 require_relative 'github_data'
 require_relative 'mongo'
 require_relative 'convert_dates'
+require 'parallel'
 
 module Analytics_Download_Controller
 
@@ -21,7 +22,7 @@ module Analytics_Download_Controller
 
 
 		# goes through each issue returned from get_Issues method
-		issues.each do |i|
+		Parallel.each(issues, :in_threads=>10) do |i|
 			# puts i
 			i = Dates_Convert_For_MongoDB.convertIssueDatesForMongo(i)
 
