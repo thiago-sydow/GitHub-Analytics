@@ -16,12 +16,12 @@ include Mongo
 
 	def self.mongo_Connect(url, port, dbName, collName)
 		# MongoDB Database Connect
-		@client = MongoClient.new(url, port)
+		#@client = MongoClient.new(url, port)
 		# @client = MongoClient.new("localhost", 27017)
 
 		# code for working with MongoLab
-		# uri = "mongodb://USERNAME:PASSWORD@ds061268.mongolab.com:61268/TimeTrackingCommits"
-		# @client = MongoClient.from_uri(uri)
+		#uri = "mongodb://#{ENV['MONGODB_USER']}:#{ENV['MONGODB_PASSWD']}@ds061268.mongolab.com:61268/TimeTrackingCommits"
+		@client = MongoClient.from_uri(ENV['MONGODB_URI'])
 
 		@db = @client[dbName]
 
@@ -30,7 +30,7 @@ include Mongo
 	end
 
 	def self.aggregate_test(input1)
-		
+
 		@collTimeTrackingCommits.aggregate(input1)
 
 	end
