@@ -6,9 +6,7 @@ require "active_support/core_ext"
 module Events_Aggregation
 
 	def self.controller
-
-		Mongo_Connection.mongo_Connect(ENV['MONGODB_URL'], ENV['MONGODB_PORT'], "GitHub-Analytics", "Issues-Data")
-
+		Mongo_Connection.mongo_Connect
 	end
 
 	def self.get_repo_issues_Events_per_month(repo, githubAuthInfo)

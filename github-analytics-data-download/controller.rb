@@ -10,7 +10,7 @@ module Analytics_Download_Controller
 		GitHub_Data.gh_sinatra_auth(object1)
 
 		# MongoDb connection: DB URL, Port, DB Name, Collection Name
-		Mongo_Connection.mongo_Connect(ENV['MONGODB_URL'], ENV['MONGODB_PORT'], "GitHub-Analytics", "Issues-Data")
+		Mongo_Connection.mongo_Connect
 
 		# Clears the DB collections if clearCollections var in controller argument is true
 		if clearCollections == true

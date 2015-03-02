@@ -3,7 +3,7 @@ require_relative './mongo'
 module System_Wide_Aggregation
 
 	def self.controller
-		Mongo_Connection.mongo_Connect(ENV['MONGODB_URL'], ENV['MONGODB_PORT'], "GitHub-Analytics", "Issues-Data")
+		Mongo_Connection.mongo_Connect
 	end
 
 	def self.get_all_repos_assigned_to_logged_user(githubAuthInfo)
