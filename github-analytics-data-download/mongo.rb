@@ -16,7 +16,7 @@ include Mongo
 	def self.mongo_Connect(dbName = nil, collName = "Issues-Data")
 
 		if ENV['MONGODB_URI']
-			@client = MongoClient.from_uri(uri)
+			@client = MongoClient.from_uri(ENV['MONGODB_URI'])
 		else
 			@client = MongoClient.new(ENV['MONGODB_URL'], ENV['MONGODB_PORT'])
 		end
