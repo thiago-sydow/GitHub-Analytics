@@ -7,15 +7,15 @@ module System_Wide_Aggregation
 	end
 
 	def self.get_all_repos_assigned_to_logged_user(githubAuthInfo)
+
 		reposAssignedToLoggedUser = Mongo_Connection.aggregate_test([
-			{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
+			#{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
 			{"$project" => {_id: 1,
 							repo: 1}},
 			{ "$group" => { _id: {
 							repo: "$repo"
 							}}}
 							])
-
 
 		output = []
 		reposAssignedToLoggedUser.each do |x|

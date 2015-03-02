@@ -14,7 +14,7 @@ include Mongo
 	end
 
 
-	def self.mongo_Connect(dbName, collName = "Issues-Data")
+	def self.mongo_Connect(dbName = nil, collName = "Issues-Data")
 
 		if ENV['MONGODB_URI']
 			@client = MongoClient.from_uri(uri)
@@ -22,7 +22,7 @@ include Mongo
 			@client = MongoClient.new(ENV['MONGODB_URL'], ENV['MONGODB_PORT'])
 		end
 
-		dbName = dbName || ENV['MONGODB_DATABASE']
+		dbName = dbName || ENV['MONGODB_DATABASE'] || "GitHub-Analytics"
 
 		@db = @client[dbName]
 

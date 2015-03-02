@@ -23,18 +23,22 @@ module Example
       def flash_types
         [:danger, :warning, :info, :success]
       end
+
+      def has_access?
+        authenticated? && github_organization_access?(ENV['ORGANIZATION'])
+      end
     end
 
     get '/' do
       # authenticate!
-      if authenticated? == true
+      if has_access?
         @username = github_user.login
         @gravatar_id = github_user.gravatar_id
         @fullName = github_user.name
         @userID = github_user.id
 
       erb :index
-     
+
       else
         erb :unauthenticated
       end
@@ -42,29 +46,29 @@ module Example
     end
 
     get '/repos' do
-      if authenticated? == true
+      if has_access?
         @reposList = Sinatra_Helpers.get_all_repos_for_logged_user(get_auth_info)
         erb :repos_listing
       else
         flash[:danger] = "You must be logged in"
         erb :unauthenticated
-      end     
+      end
     end
 
     get '/download' do
-      if authenticated? == true
+      if has_access?
         erb :download
       else
         # TODO: This needs work as it is not loading the message by the time the page loads.
         flash[:danger] = "You must be logged in"
         redirect '/'
-        
-      end 
+
+      end
     end
 
     get '/download/:user/:repo' do
       # authenticate!
-      if authenticated? == true
+      if has_access?
         @username = github_user.login
         @userID = github_user.id
 
@@ -78,7 +82,7 @@ module Example
 
     get '/analyze/issues/:user/:repo' do
       # authenticate!
-      if authenticated? == true
+      if has_access?
 
         @issuesOpenedPerUser = Sinatra_Helpers.analyze_issues_opened_per_user(params['user'], params['repo'], get_auth_info )
         @issuesOpenedPerUserChartReady ={}
@@ -86,7 +90,7 @@ module Example
         @issuesOpenedPerUser.each do |i|
           @issuesOpenedPerUserChartReady[i["user"]] = i["issues_opened_count"]
         end
-      
+
         erb :analyze_issues_opened_per_user
       else
         redirect '/'
@@ -95,7 +99,7 @@ module Example
 
     get '/analyze/labels/:user/:repo' do
       # authenticate!
-      if authenticated? == true
+      if has_access?
 
         @labelsCountForRepo = Sinatra_Helpers.analyze_labels_count_per_repo(params['user'], params['repo'], get_auth_info )
         @labelsCountForRepoChartReady ={}
@@ -103,7 +107,7 @@ module Example
         @labelsCountForRepo.each do |l|
           @labelsCountForRepoChartReady[l["label"]] = l["count"]
         end
-      
+
         erb :analyze_labels_for_repo
       else
         redirect '/'
@@ -113,7 +117,7 @@ module Example
 
     get '/analyze/issues/events/:user/:repo' do
       # authenticate!
-      if authenticated? == true
+      if has_access?
 
         @repoIssueEvents = Sinatra_Helpers.analyze_repo_issues_Events_per_month(params['user'], params['repo'], get_auth_info )
         # @repoIssueEventsChartReady ={}
@@ -121,22 +125,16 @@ module Example
         # @repoIssueEvents.each do |l|
         #   @repoIssueEventsChartReady[l["events"]] = l["count"]
         # end
-      
+
         erb :analyze_repo_issue_events
       else
         redirect '/'
       end
     end
 
-
-
-
-
-
-
     get '/analyze/issues/statetimeline/:user/:repo' do
       # authenticate!
-      if authenticated? == true
+      if has_access?
 
         @issuesOpenedPerMonth = Sinatra_Helpers.analyze_issues_opened_per_month(params['user'], params['repo'], get_auth_info)
         @issuesClosedPerMonth = Sinatra_Helpers.analyze_issues_closed_per_month(params['user'], params['repo'], get_auth_info)
@@ -151,8 +149,6 @@ module Example
           @issuesClosedPerMonthChartReady[i["converted_date"].strftime("%b %Y")] = i["count"]
         end
 
-
-
         @issuesOpenedPerWeek = Sinatra_Helpers.analyze_issues_opened_per_week(params['user'], params['repo'], get_auth_info)
         @issuesClosedPerWeek = Sinatra_Helpers.analyze_issues_closed_per_week(params['user'], params['repo'], get_auth_info)
         @issuesOpenedPerWeekChartReady ={}
@@ -166,17 +162,11 @@ module Example
           @issuesClosedPerWeekChartReady["Week #{i["converted_date"].strftime("%U, %Y")}"] = i["count"]
         end
 
-
-
-
-      
         erb :analyze_issues_opened_closed_per_month
       else
         redirect '/'
       end
     end
-
-
 
     get '/logout' do
       logout!
