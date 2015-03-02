@@ -3,19 +3,19 @@ require_relative './mongo'
 module System_Wide_Aggregation
 
 	def self.controller
-		Mongo_Connection.mongo_Connect(ENV['MONGODB_URL'], ENV['MONGODB_PORT'], "GitHub-Analytics", "Issues-Data")
+		Mongo_Connection.mongo_Connect
 	end
 
 	def self.get_all_repos_assigned_to_logged_user(githubAuthInfo)
+
 		reposAssignedToLoggedUser = Mongo_Connection.aggregate_test([
-			{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
+			#{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
 			{"$project" => {_id: 1,
 							repo: 1}},
 			{ "$group" => { _id: {
 							repo: "$repo"
 							}}}
 							])
-
 
 		output = []
 		reposAssignedToLoggedUser.each do |x|
@@ -25,6 +25,7 @@ module System_Wide_Aggregation
 			x["_id"]["repo_name_full"] = toParseString
 			output << x["_id"]
 		end
+		
 		return output
 	end
 end

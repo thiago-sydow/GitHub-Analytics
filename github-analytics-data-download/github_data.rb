@@ -42,7 +42,7 @@ module GitHub_Data
 
 	def self.get_Issues(repo)
 
-		puts "1: #{@ghClient.rate_limit.remaining}"
+		puts "List Open Issues - Rate Limit Remaining: #{@ghClient.rate_limit.remaining}"
 		issueResultsOpen = @ghClient.list_issues(repo, {
 			:state => :open,
 			:per_page => PAGE_SIZE
@@ -52,12 +52,12 @@ module GitHub_Data
 		responseOpen = JSON.parse(@ghClient.last_response.response_body)
 
 		while ghLastReponseOpen.rels.include?(:next) do
-			puts "2: #{@ghClient.rate_limit.remaining}"
+			puts "Open Issues - Rate Limit Remaining: #{@ghClient.rate_limit.remaining}"
 			ghLastReponseOpen = ghLastReponseOpen.rels[:next].get
 			responseOpen.concat(JSON.parse(ghLastReponseOpen.response_body))
 		end
 
-		puts "3: #{@ghClient.rate_limit.remaining}"
+		puts "List Closed Issues - Rate Limit Remaining: #{@ghClient.rate_limit.remaining}"
 		issueResultsClosed = @ghClient.list_issues(repo, {
 			:state => :closed,
 			:per_page => PAGE_SIZE
@@ -67,7 +67,7 @@ module GitHub_Data
 		responseClosed = JSON.parse(@ghClient.last_response.response_body)
 
 		while ghLastReponseClosed.rels.include?(:next) do
-			puts "4: #{@ghClient.rate_limit.remaining}"
+			puts "Closed Issues - Rate Limit Remaining: #{@ghClient.rate_limit.remaining}"
 			ghLastReponseClosed = ghLastReponseClosed.rels[:next].get
 			responseClosed.concat(JSON.parse(ghLastReponseClosed.response_body))
 		end

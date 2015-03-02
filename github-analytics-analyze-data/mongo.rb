@@ -14,25 +14,23 @@ include Mongo
 	end
 
 
-	def self.mongo_Connect(url, port, dbName, collName)
-		# MongoDB Database Connect
-		@client = MongoClient.new(url, port)
-		# @client = MongoClient.new("localhost", 27017)
-		dbName = ENV['MONGODB_DATABASE'] || dbName
-		# code for working with MongoLab
-		# uri = "mongodb://USERNAME:PASSWORD@ds061268.mongolab.com:61268/TimeTrackingCommits"
-		# @client = MongoClient.from_uri(uri)
+	def self.mongo_Connect(dbName = nil, collName = "Issues-Data")
+
+		if ENV['MONGODB_URI']
+			@client = MongoClient.from_uri(uri)
+		else
+			@client = MongoClient.new(ENV['MONGODB_URL'], ENV['MONGODB_PORT'])
+		end
+
+		dbName = dbName || ENV['MONGODB_DATABASE'] || "GitHub-Analytics"
 
 		@db = @client[dbName]
 
 		@collTimeTrackingCommits = @db[collName]
-
 	end
 
 	def self.aggregate_test(input1)
-
 		@collTimeTrackingCommits.aggregate(input1)
-
 	end
 
 end

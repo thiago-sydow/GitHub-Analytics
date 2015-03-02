@@ -3,9 +3,7 @@ require_relative './mongo'
 module Labels_Aggregation
 
 	def self.controller
-
-		Mongo_Connection.mongo_Connect(ENV['MONGODB_URL'], ENV['MONGODB_PORT'], "GitHub-Analytics", "Issues-Data")
-
+		Mongo_Connection.mongo_Connect
 	end
 
 	def self.get_labels_count_for_repo(repo, githubAuthInfo)

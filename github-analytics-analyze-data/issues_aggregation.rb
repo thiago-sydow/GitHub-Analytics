@@ -6,9 +6,7 @@ require "active_support/core_ext"
 module Issues_Aggregation
 
 	def self.controller
-
-		Mongo_Connection.mongo_Connect(ENV['MONGODB_URL'], ENV['MONGODB_PORT'], "GitHub-Analytics", "Issues-Data")
-
+		Mongo_Connection.mongo_Connect
 	end
 
 	def self.get_issues_opened_per_user(repo, githubAuthInfo)
