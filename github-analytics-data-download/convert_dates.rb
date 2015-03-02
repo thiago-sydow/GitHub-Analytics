@@ -1,7 +1,6 @@
 module Dates_Convert_For_MongoDB
 
-
-def self.convertIssueCommentDatesInMongo(issueComments)
+	def self.convertIssueCommentDatesInMongo(issueComments)
 		issueComments["created_at"] = Time.strptime(issueComments["created_at"], '%Y-%m-%dT%H:%M:%S%z').utc
 		issueComments["updated_at"] = Time.strptime(issueComments["updated_at"], '%Y-%m-%dT%H:%M:%S%z').utc
 		return issueComments

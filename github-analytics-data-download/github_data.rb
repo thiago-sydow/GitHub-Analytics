@@ -40,51 +40,42 @@ module GitHub_Data
 										)
 	end
 
-	def self.get_Issues(repo)
-
-		puts "List Open Issues - Rate Limit Remaining: #{@ghClient.rate_limit.remaining}"
-		issueResultsOpen = @ghClient.list_issues(repo, {
-			:state => :open,
-			:per_page => PAGE_SIZE
-			})
-
-		ghLastReponseOpen = @ghClient.last_response
-		responseOpen = JSON.parse(@ghClient.last_response.response_body)
-
-		while ghLastReponseOpen.rels.include?(:next) do
-			puts "Open Issues - Rate Limit Remaining: #{@ghClient.rate_limit.remaining}"
-			ghLastReponseOpen = ghLastReponseOpen.rels[:next].get
-			responseOpen.concat(JSON.parse(ghLastReponseOpen.response_body))
-		end
-
-		puts "List Closed Issues - Rate Limit Remaining: #{@ghClient.rate_limit.remaining}"
+	def self.get_closed_issues(repo)
 		issueResultsClosed = @ghClient.list_issues(repo, {
 			:state => :closed,
 			:per_page => PAGE_SIZE
 			})
 
 		ghLastReponseClosed = @ghClient.last_response
-		responseClosed = JSON.parse(@ghClient.last_response.response_body)
+    total_pages = ghLastReponseClosed.rels[:last].href.match(/page=(\d+)/)[1]
+
+  	responseClosed = JSON.parse(@ghClient.last_response.response_body)
 
 		while ghLastReponseClosed.rels.include?(:next) do
-			puts "Closed Issues - Rate Limit Remaining: #{@ghClient.rate_limit.remaining}"
-			ghLastReponseClosed = ghLastReponseClosed.rels[:next].get
-			responseClosed.concat(JSON.parse(ghLastReponseClosed.response_body))
+      page_number = ghLastReponseClosed.rels[:next].href.match(/page=(\d+)/)[1]
+      ghLastReponseClosed = ghLastReponseClosed.rels[:next].get
+      puts "Closed Issues - Page Number #{page_number} of #{total_pages}"
+      yield JSON.parse(ghLastReponseClosed.response_body)
 		end
-
-		return mergedIssues = responseOpen + responseClosed
 	end
 
-	# def self.get_Milestones(repo)
-	# 	milestonesResultsOpen = @ghClient.list_milestones(repo, {
-	# 		:state => :open
-	# 		})
-	# 	milestonesResultsClosed = @ghClient.list_milestones(repo, {
-	# 		:state => :closed
-	# 		})
+  def self.get_open_issues(repo)
+		issueResultsOpen = @ghClient.list_issues(repo, {
+			:state => :open,
+			:per_page => PAGE_SIZE
+			})
 
-	# 	return mergedMilestones = milestonesResultsOpen + milestonesResultsClosed
-	# end
+		ghLastReponseOpen = @ghClient.last_response
+    total_pages = ghLastReponseOpen.rels[:last].href.match(/page=(\d+)/)[1]
+		responseOpen = JSON.parse(@ghClient.last_response.response_body)
+
+		while ghLastReponseOpen.rels.include?(:next) do
+      page_number = ghLastReponseOpen.rels[:next].href.match(/page=(\d+)/)[1]
+      ghLastReponseOpen = ghLastReponseOpen.rels[:next].get
+      puts "Open Issues - Page Number #{page_number} of #{total_pages}"
+      yield JSON.parse(ghLastReponseOpen.response_body)
+		end
+	end
 
 	def self.get_Issue_Comments(repo, issueNumber)
 		puts "5: #{@ghClient.rate_limit.remaining}"
@@ -104,15 +95,6 @@ module GitHub_Data
 		return responseComments
 	end
 
-	# def self.get_code_commits(repo)
-	# 	repoCommits = @ghClient.commits(repo)
-	# end
-
-	# def self.get_commit_comments(repo, sha)
-	# 	commitComments = @ghClient.commit_comments(repo, sha)
-	# end
-
-
 	def self.get_repo_issue_events(repo)
 		issueResultsOpen = @ghClient.repository_issue_events(repo, {
 			:per_page => PAGE_SIZE
@@ -128,10 +110,3 @@ module GitHub_Data
 	end
 
 end
-
-
-# GitHub_Data.gh_authenticate("StephenOTT", "PASSWORD")
-# issues = GitHub_Data.get_Issues("StephenOTT/Test1")
-# repoIssueEvents = GitHub_Data.get_repo_events("StephenOTT/Test1")
-# pp issues
-# puts repoIssueEvents

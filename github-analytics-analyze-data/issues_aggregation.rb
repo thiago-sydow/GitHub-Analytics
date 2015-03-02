@@ -12,7 +12,7 @@ module Issues_Aggregation
 	def self.get_issues_opened_per_user(repo, githubAuthInfo)
 		totalIssueSpentHoursBreakdown = Mongo_Connection.aggregate_test([
 			{ "$match" => {type: "Issue"}},
-			{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
+			#{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
 			{"$project" => {number: 1,
 							_id: 1,
 							repo: 1,
@@ -35,7 +35,7 @@ module Issues_Aggregation
 	def self.get_issues_created_per_month(repo, githubAuthInfo)
 		totalIssuesOpen = Mongo_Connection.aggregate_test([
 			{ "$match" => {type: "Issue"}},
-			{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
+			#{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
 			# { "$match" => {state: {
 			# 							"$ne" => "closed"
 			# 							}}},
@@ -73,28 +73,6 @@ module Issues_Aggregation
 			output << x["_id"]
 		end
 
-		# # TODO build this out into its own method to ensure DRY.
-		# if output.empty? == false
-		# 	# Get Missing Months/Years from Date Range
-		# 	a = []
-		# 	output.each do |x|
-		# 		a << x["converted_date"]
-		# 	end
-		# 	b = (output.first["converted_date"]..output.last["converted_date"]).to_a
-
-		# 	# zeroValueDates = (b.map{ |date| date } - a.map{ |date| date }).uniq
-		# 	zeroValueDates = (b.map{ |date| date.strftime("%b %Y") } - a.map{ |date| date.strftime("%b %Y") }).uniq
-		# 	puts zeroValueDates
-		# 	zeroValueDates.each do |zvd|
-		# 		zvd = DateTime.parse(zvd)
-		# 		# zvd = DateTime.parse(zvd)
-		# 		output << {"repo"=> repo, "created_year"=>zvd.strftime("%Y").to_i, "created_month"=>zvd.strftime("%m").to_i, "count"=>0, "converted_date"=>zvd}
-		# 	end
-		# 	# END of Get Missing Months/Years From Date Range
-		# end
-
-		# # Sorts the Output hash so the dates are in order
-		# output = output.sort_by { |hsh| hsh["converted_date"] }
 		return output
 	end
 
