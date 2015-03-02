@@ -13,7 +13,6 @@ include Mongo
 		@collTimeTrackingCommits.insert(mongoPayload)
 	end
 
-
 	def self.mongo_Connect(dbName = nil, collName = "Issues-Data")
 
 		if ENV['MONGODB_URI']
@@ -30,9 +29,7 @@ include Mongo
 	end
 
 	def self.aggregate_test(input1)
-
 		@collTimeTrackingCommits.aggregate(input1)
-
 	end
 
 end

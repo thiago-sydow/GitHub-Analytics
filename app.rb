@@ -25,8 +25,17 @@ module Example
       end
 
       def has_access?
-        authenticated? && github_organization_access?(ENV['ORGANIZATION'])
+        authenticated? && restrict_to_organization?
       end
+
+      def restrict_to_organization?
+        if ENV['ORGANIZATION']
+          github_organization_access?(ENV['ORGANIZATION'])
+        else
+          true
+        end
+      end
+
     end
 
     get '/' do

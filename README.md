@@ -16,9 +16,6 @@ Analytics are then run on the issues and comments in the mongodb database.
 Primary use at this point is project management based analytics that are not currently available on GitHub.com
 
 
-**New:::** Support for downloading multiple repositories into the same database allowing analysis of multiple repositories at the same time: EXAMPLE: 
-
-
 ## How to run the Web App:
 
 1. Register/Create a Application at https://github.com/settings/applications/new.  Set your fields to the following:
@@ -26,7 +23,7 @@ Primary use at this point is project management based analytics that are not cur
 	1.1. Homepage URL: `http://localhost:9292`
 
 	1.2. Authorization callback URL: `http://localhost:9292/auth/github/callback`
-	
+
 	1.3. Application Name: `GitHub-Analytics` or whatever you want to call your application.
 
 2. Install MongoDB (typically: `brew update`, followed by: `brew install mongodb`)
@@ -36,13 +33,19 @@ Primary use at this point is project management based analytics that are not cur
 	3.1. Run `mongod` in terminal
 
 	3.2. Open a second terminal window and run: `bundle install`
-	
-	3.3.`GITHUB_CLIENT_ID="YOUR CLIENT ID" GITHUB_CLIENT_SECRET="YOUR CLIENT SECRET" bundle exec rackup`
+
+	3.3.`MONGODB_URL="localhost" MONGODB_PORT="27017" GITHUB_CLIENT_ID="CLIENT_ID"  GITHUB_CLIENT_SECRET="CLIENT_SECRET" ORGANIZATION="YOUR_ORGANIZATION" bundle exec rackup`
 	Get the Client ID and Client Secret from the settings of your created/registered GitHub Application in Step 1.
 
-4. Go to `http://localhost:9292`
+Obs:
+
+1. If you are using an external MongoDB service, instead of set MONGODB_URL and MONGODB_PORT,
+you can set only MONGODB_URI using the URI from your service.
+
+2. The ORGANIZATION variable is optional, and if set it will restrict the access only to users that are part of the given Organization.
 
 
+	Go to `http://localhost:9292`
 
 ## Presentations:
 
@@ -89,7 +92,7 @@ Github Analytics: Ruby Ottawa Meetup (http://bit.ly/1cVFe9s)
 7. History of Issues within a Milestone
 
  7.1. History of percentage complete of a Milestone
- 
+
 8. Break down of GFM Task Lists per users and aggregate per repo and across multiple repos
 
 9. History of Issue Assignment per issue.
@@ -205,14 +208,14 @@ Pie chart of Issue Event Types - All Issue events for all issues
 - [x] Downloading of Repo Events into Mongodb
 - [x] Convert to Sinatra app
 - [x] Downloading of Team data
-- [x] Turn Github DateTime string into recognized Mongodb dateTime.  Currently github datetime string is not properly recognized by Mongodb. 
+- [x] Turn Github DateTime string into recognized Mongodb dateTime.  Currently github datetime string is not properly recognized by Mongodb.
 - [x] refactor method usage of Date conversions
 - [x] refactor analyze methods names and structure
 - [x] refactor methods into multifile MVC part of sinatra conversion
 - [ ] Build Dashboard that is equiv of the Github Survivor app (https://github.com/99designs/githubsurvivor)
 - [ ] PRIORITY: Develop Temp glue code for proper timezone query and output.  Because of Mongos lack of timeline support at the query level for the Aggregation framework.
 - [ ] Refactor code to follow worker/job model to support sidekiq for calling jobs.  Current issue is mainly based in the calling of issues, issue comments, and issue events.  Each of these three can easily tax out the GitHub API hourly rate limit for the specific user.  This mainly occurs for large projects such as WET-BOEW/WET-BOEW.
-- [x] Refactor code for more ruby like Naming conventions and integration of methods and classes. 
+- [x] Refactor code for more ruby like Naming conventions and integration of methods and classes.
 
 
 
@@ -257,4 +260,3 @@ https://github.com/StephenOTT/GitHub-Analytics/issues/1#issuecomment-29685800
 6. Repo Comparisons - Allows you to select 2 or more Repos and be provided with comparative stats (issues, users, stars, languages, labels, activity, Git Stats, Keywords, Revision Activity, similar users, similar code, Gems/Libraries/etc used, similar dependencies
 
 7. Have a ability to grab all of the users stats about their system when creating an issue in GitHub.  Stats like: Device, browser, resolution, browser version, OS, etc.
-

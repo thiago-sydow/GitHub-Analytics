@@ -27,12 +27,12 @@ module Analytics_Download_Controller
 			i = Dates_Convert_For_MongoDB.convertIssueDatesForMongo(i)
 
 			# Gets the comments for the specific issue
-			issueComments = GitHub_Data.get_Issue_Comments(repo, i["number"])
-			issueComments.each do |ic|
-				ic = Dates_Convert_For_MongoDB.convertIssueCommentDatesInMongo(ic)
-			end
+			#issueComments = GitHub_Data.get_Issue_Comments(repo, i["number"])
+			#issueComments.each do |ic|
+			#	ic = Dates_Convert_For_MongoDB.convertIssueCommentDatesInMongo(ic)
+			#end
 
-			i["comments"] = issueComments
+			#i["comments"] = issueComments
 			i["downloaded_by_username"] = githubAuthInfo[:username]
 			i["downloaded_by_userID"] = githubAuthInfo[:userID]
 			i["repo"] = repo
