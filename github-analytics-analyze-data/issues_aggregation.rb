@@ -80,7 +80,7 @@ module Issues_Aggregation
 
 		totalIssuesClosed = Mongo_Connection.aggregate_test([
 			{ "$match" => {type: "Issue"}},
-			{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
+			#{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
 			{ "$match" => {state: {
 										"$ne" => "open"
 										}}},
@@ -145,7 +145,7 @@ module Issues_Aggregation
 	def self.get_issues_created_per_week(repo, githubAuthInfo)
 		totalIssuesOpen = Mongo_Connection.aggregate_test([
 			{ "$match" => {type: "Issue"}},
-			{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
+			#{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
 			# { "$match" => {state: {
 			# 							"$ne" => "closed"
 			# 							}}},
@@ -222,7 +222,7 @@ module Issues_Aggregation
 
 		totalIssuesClosed = Mongo_Connection.aggregate_test([
 			{ "$match" => {type: "Issue"}},
-			{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
+			#{ "$match" => { downloaded_by_username: githubAuthInfo[:username], downloaded_by_userID: githubAuthInfo[:userID] }},
 			{ "$match" => {state: {
 										"$ne" => "open"
 										}}},
