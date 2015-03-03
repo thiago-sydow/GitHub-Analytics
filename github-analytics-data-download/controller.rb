@@ -22,19 +22,19 @@ module Analytics_Download_Controller
 		GitHub_Data.get_closed_issues(repo) { |issues| self.save_issues(repo, issues, githubAuthInfo) }
 
 		#======Repo Issue Events======
-		repoIssueEvents = GitHub_Data.get_repo_issue_events(repo)
+		#repoIssueEvents = GitHub_Data.get_repo_issue_events(repo)
 		# puts repoIssueEvents.to_s
-		repoIssueEvents.each do |rie|
+		#repoIssueEvents.each do |rie|
 
-			rie = Dates_Convert_For_MongoDB.convertRepoEventsDates(rie)
+			#rie = Dates_Convert_For_MongoDB.convertRepoEventsDates(rie)
 
-			rie["downloaded_by_username"] = githubAuthInfo[:username]
-			rie["downloaded_by_userID"] = githubAuthInfo[:userID]
-			rie["repo"] = repo
-			rie["type"] = "Repo Issue Event"
-			rie["download_datetime"] = Time.now.utc
-			Mongo_Connection.putIntoMongoCollTimeTrackingCommits(rie)
-		end
+			#rie["downloaded_by_username"] = githubAuthInfo[:username]
+			#rie["downloaded_by_userID"] = githubAuthInfo[:userID]
+			#rie["repo"] = repo
+			#rie["type"] = "Repo Issue Event"
+			#rie["download_datetime"] = Time.now.utc
+			#Mongo_Connection.putIntoMongoCollTimeTrackingCommits(rie)
+		#end
 	end
 
 	private
